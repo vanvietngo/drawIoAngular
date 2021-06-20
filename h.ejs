@@ -1,0 +1,175 @@
+<html>
+<title>Draw.io Embedded</title>
+<head>
+	<style type="text/css">
+		/* html, body, #wrapper {
+			height:100%;
+			width:100%;
+			margin:0;
+			padding:0;
+			border:0;
+		}
+		table#wrapper {
+			height:75%;
+		}
+		#wrapper td {
+			vertical-align:middle;
+			text-align:center;
+		} */
+		iframe {
+			border:0;
+			position:fixed;
+			top:0;
+			left:0;
+			right:0;
+			bottom:0;
+			width:100%;
+			height:100%
+		}
+	</style>
+
+<!-- <script type="text/javascript" src="../uploaded_files/prop.js" ></script>
+<script type="text/javascript" src="../uploaded_files/var.js" ></script> -->
+
+
+	<script type="text/javascript">
+		var editor = 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&proto=json&returnbounds=1';
+		var initial = null;
+		var name = null;
+
+		function edit(image)
+		{
+			var iframe = document.createElement('iframe');
+			// iframe.setAttribute('frameborder', '10');
+
+			var close = function()
+			{
+				window.removeEventListener('message', receive);
+				document.body.removeChild(iframe);
+			};
+
+			var draft = localStorage.getItem('.draft-' + name);
+				console.log("draft = " + draft)
+			if (draft != null)
+			{
+				draft = JSON.parse(draft);
+
+				if (!confirm("A version of this page from " + new Date(draft.lastModified) + " is available. Would you like to continue editing?"))
+				{
+					draft = null;
+				}
+			}
+
+			var receive = function(evt)
+			{
+				if (evt.data.length > 0)
+				{
+					var msg = JSON.parse(evt.data);
+					// if (event.origin !== "https://embed.diagrams.net"){
+						console.log("at Angular recie event , data event = " + JSON.stringify (evt.data))
+
+					// }
+					if (msg.event == 'init')
+					{
+						if (draft != null)
+						{
+							iframe.contentWindow.postMessage(JSON.stringify({action: 'load',
+							xmlpng:image.getAttribute('src'),
+								autosave: 1}), '*');
+							// iframe.contentWindow.postMessage(JSON.stringify({action: 'status',
+							// 	modified: true}), '*');
+						}
+						else
+						{
+							// iframe.contentWindow.postMessage(JSON.stringify({action: 'load',
+							// 	autosave: 1, xmlpng: image.getAttribute('src')}), '*');
+								iframe.contentWindow.postMessage(JSON.stringify({action: 'load',
+								autosave: 1, xmlpng: image.getAttribute('src')}), '*');
+						}
+					}
+					else if (msg.event == 'export')
+					{
+						// console.log("msg data export " + msg.data)
+						image.setAttribute('src', msg.data);
+						console.log("msg.data = " + msg.data)
+						localStorage.setItem(name, JSON.stringify({lastModified: new Date(), data: msg.data}));
+						localStorage.removeItem('.draft-' + name);
+						draft = null;
+						close();
+					}
+					// else if (msg.event == 'autosave')
+					// {
+					// 	// console.log("msg.data = " +JSON.stringify(msg.data))
+					// 	console.log("msg.xml = " +JSON.stringify(msg))
+					// 	localStorage.setItem('.draft-' + name, JSON.stringify({lastModified: new Date(), xml: msg.xml}));
+					// }
+					else if (msg.event == 'save')
+					{
+						// console.log("data postPlugin at app Angular = " + dataOfPlugin)
+
+						iframe.contentWindow.postMessage(JSON.stringify({action: 'export',
+							format: 'xmlpng', xml: msg.xml, spin: 'Updating page'}), '*');
+						localStorage.setItem('.draft-' + name, JSON.stringify({lastModified: new Date(), xml: msg.xml}));
+					}
+					else if (msg.event == 'exit')
+					{
+						localStorage.removeItem('.draft-' + name);
+						draft = null;
+						close();
+					}
+					// my code
+					 if(msg.testThui!=null){
+						 console.log("data Object = :")
+						console.log(msg.testThui)
+					}
+				}
+			};
+
+			window.addEventListener('message', receive);
+			iframe.setAttribute('src', editor);
+			document.body.appendChild(iframe);
+		};
+
+		function load()
+		{
+			initial = document.getElementById('image').getAttribute('src');
+			start();
+		};
+
+		function start()
+		{
+			name = (window.location.hash.length > 1) ? window.location.hash.substring(1) : 'default';
+			var current = localStorage.getItem(name);
+
+			if (current != null)
+			{
+				var entry = JSON.parse(current);
+				// console.log("entry = " + entry)
+				document.getElementById('image').setAttribute('src', entry.data);
+			}
+			else
+			{
+				document.getElementById('image').setAttribute('src', initial);
+			}
+		};
+
+
+		window.addEventListener('hashchange', start);
+
+	</script>
+</head>
+<body onload="load();">
+	<div >
+		<button onclick="hehe()">clik mee</button>
+		<button onclick="hihi()">clik mee hihi</button>
+
+	</div>
+<table id="wrapper">
+	<tr>
+		<td><img id="image" style="max-width:100%;cursor:pointer;" onclick="edit(this);" src="../uploaded_files/lee.jpeg" /></td>
+	</tr>
+</table>
+<!-- <div style="position:fixed;font-family:Arial,Helvetica;font-size:10pt;color:#cccccc;bottom:0px;right:0px;margin-right:10px;margin-bottom:10px;">Powered by <a href="https://www.diagrams.net" target="_blank"/>diagrams.net</a></div> -->
+
+</body>
+</html>
