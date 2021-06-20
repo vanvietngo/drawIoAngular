@@ -91,7 +91,7 @@ export class DrawIOComponent implements OnInit {
           localStorage.removeItem('draft_Temp')
           this.renderer.setStyle(this.iframe?.nativeElement, 'display', 'none')
         }
-        else if (msg.event == "dataCells") {
+        else if (msg.event == "autosave") {
           // localStorage.setItem('dataImgAfterExport',JSON.stringify(msg.data))
           let dataC = JSON.stringify(msg.dataCells)
           console.log("angular nhan dc datacells  dataCdataCdataC= " + dataC)

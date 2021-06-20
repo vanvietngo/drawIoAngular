@@ -128,35 +128,63 @@ Draw.loadPlugin(function (ui) {
 		count++
 		var dataCells = JSON.stringify(getNodesFrom(graph))
 		// post to angular
-		window.parent.postMessage(JSON.stringify({
-			event: "dataCells",
-			dataCells: dataCells
-		}), '*')
+		// window.parent.postMessage(JSON.stringify({
+		// 	event: "dataCells",
+		// 	dataCells: dataCells
+		// }), '*')
 		// post in draw
 		// window.postMessage(JSON.stringify({
 		// 	event: "dataCells",
 		// 	dataCells: dataCells
 		// }), '*')
+	});
+	var n = 1
 window.addEventListener("message", function (evt) {
 	console.log("event at draw IO = " + JSON.stringify(evt.data))
 	if (evt.data.length > 0) {
 		var msg = JSON.parse(evt.data);
 		// console.log("window draw nhan dc event " + JSON.stringify(msg))
-		if (msg.event == "updateCells") {
+
+		if (msg.event == "updateCells" && n == 1) {
+			n++
+			
 			console.log("nhan dc event update Cells")
 			console.log("id change = "+msg.data.id)
 
+			//
+			
 			// get cell 
-			var vertex = graph.getModel().getCell(msg.data.id)
-			var previous = vertex.value.getAttribute('label');
-			vertex.value.setAttribute('label', msg.data.label);
-						console.log("value change vuet = "+previous)
+			// var vertex = graph.getModel().getCell(msg.data.id)
+			var vertex = graph.getModel().getCell("308")
+
+			// check case
+			if(vertex.value.attributes != null){
+				console.log("attribute not nullllllllllllllllllll" + vertex.value)
+			// 				// set value change
+			// var previous = vertex.value.getAttribute('label');
+			// vertex.value.setAttribute('hihi', msg.data.label);
+			// 			console.log("value change vuet = "+previous)
+			// graph.getModel().remove(vertex)
+										var doc = mxUtils.createXmlDocument();
+						var node = doc.createElement('myNodeeeee')
+						node.setAttribute('label', 'viet 123456');
+						node.setAttribute('name', 'hihi');
+						// console.log(node.value)
+						graph.insertVertex(graph.getDefaultParent(), null, node, 40, 40, 80, 30);	
+			}
+			else{
+				// attribute 
+				console.log("attribute  nullllllllllllllllllll" + vertex.value)
+
+				vertex.setValue("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+			}
+
 
 			
 		}
 	}
 })
-	});
+	
 
 
 	// console.log(graph.getCell)
@@ -203,3 +231,8 @@ window.addEventListener("message", function (evt) {
 // 	}
 // })
 
+							// var doc = mxUtils.createXmlDocument();
+						// var node = doc.createElement('myNodeeeee')
+						// node.setAttribute('label', 'viet 123456');
+						// node.setAttribute('name', 'hihi');
+						// graph.insertVertex(graph.getDefaultParent(), null, node, 40, 40, 80, 30);	
